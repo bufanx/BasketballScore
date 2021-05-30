@@ -1,9 +1,16 @@
 package com.permissionx.bbscore
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.PowerManager
+import android.provider.Settings
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -23,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var redTeamName:String
     private lateinit var blueTeamName:String
     private var totalTime by Delegates.notNull<Int>()
+    private var refreshTfCountTimer:Boolean = false
     var TFSecond:Long = Info.TFSecond
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,11 +138,21 @@ class MainActivity : AppCompatActivity() {
                     imageButton_reset.setImageResource(R.drawable.ic_baseline_play_arrow_24)
                     countDownTimer.cancel()
                     TFcountDownTimer.cancel()
+                    reset_24.setOnClickListener {
+                        refreshTfCountTimer = true
+                        second_left.text = "24"
+                    }
                 }
                 PlayStatus.Paused -> {
                     imageButton_reset.setImageResource(R.drawable.ic_baseline_pause_24)
                     countDownTimer.start()
                     TFcountDownTimer.start()
+                    if (refreshTfCountTimer){
+                        TFSecond = Info.TFSecond - 1
+                        TFcountDownTimer.cancel()
+                        TFcountDownTimer.start()
+                        refreshTfCountTimer = false
+                    }
                 }
                 else -> imageButton_reset.setImageResource(R.drawable.ic_baseline_pause_24)
             }
